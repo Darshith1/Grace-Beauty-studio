@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { type Model } from 'mongoose'
 
 const lineItemSchema = new mongoose.Schema(
   {
@@ -14,7 +14,11 @@ const lineItemSchema = new mongoose.Schema(
   { _id: false }
 )
 
-export const ServiceModel =
+/**
+ * `mongoose.models.X || mongoose.model(...)` can infer a type where static helpers
+ * like `.find()` are not callable (TS2349) under some TS / CI setups (e.g. Vercel).
+ */
+export const ServiceModel = (
   mongoose.models.Service ||
   mongoose.model(
     'Service',
@@ -34,8 +38,9 @@ export const ServiceModel =
       { timestamps: true }
     )
   )
+) as Model<any>
 
-export const StylistModel =
+export const StylistModel = (
   mongoose.models.Stylist ||
   mongoose.model(
     'Stylist',
@@ -52,8 +57,9 @@ export const StylistModel =
       { timestamps: true }
     )
   )
+) as Model<any>
 
-export const AppointmentModel =
+export const AppointmentModel = (
   mongoose.models.Appointment ||
   mongoose.model(
     'Appointment',
@@ -75,8 +81,9 @@ export const AppointmentModel =
       { timestamps: true }
     )
   )
+) as Model<any>
 
-export const AdminModel =
+export const AdminModel = (
   mongoose.models.Admin ||
   mongoose.model(
     'Admin',
@@ -86,3 +93,4 @@ export const AdminModel =
       name: { type: String, default: '' },
     })
   )
+) as Model<any>
