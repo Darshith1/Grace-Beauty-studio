@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { CustomerChrome } from './components/CustomerChrome'
 import { HomePage } from './pages/HomePage'
 import { ServiceMenuPage } from './pages/book/ServiceMenuPage'
@@ -39,6 +40,7 @@ export default function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   )
 }
