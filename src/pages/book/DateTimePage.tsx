@@ -2,8 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { DateTime } from 'luxon'
 import { useBookingStore } from '../../store/bookingStore'
-import { SALON_PHONE_TEL } from '../../lib/salon'
-import { SALON_TIMEZONE } from '../../lib/salon'
+import { SALON_PHONE_TEL, SALON_TIMEZONE } from '../../lib/salon'
 import { AppointmentSummary } from '../../components/AppointmentSummary'
 import { bookBg, mobileSummaryDockPosition } from '../../lib/bookingUi'
 import { apiGetPublic } from '../../lib/api'
@@ -122,7 +121,9 @@ export function DateTimePage() {
 
   useEffect(() => {
     let cancelled = false
-    setBusyLoading(true)
+    queueMicrotask(() => {
+      if (!cancelled) setBusyLoading(true)
+    })
     apiGetPublic<{ date: string; busy: BusyInterval[] }>(
       `/api/booking/busy?date=${encodeURIComponent(selectedKey)}`
     )
@@ -208,7 +209,8 @@ export function DateTimePage() {
     const dk = selectedDateKey ?? todayKey
     const dt = DateTime.fromISO(dk, { zone: SALON_TIMEZONE })
     if (dt.isValid) {
-      setMonthCursor(dt.startOf('month'))
+      const next = dt.startOf('month')
+      queueMicrotask(() => setMonthCursor(next))
     }
   }, [selectedDateKey, todayKey])
 

@@ -3,11 +3,6 @@ export type LineItemLike = {
   durationMinutes: number
 }
 
-export function appointmentEnd(scheduledAt: Date, lineItems: LineItemLike[]): Date {
-  const total = lineItems.reduce((a, l) => a + l.durationMinutes, 0)
-  return new Date(scheduledAt.getTime() + total * 60 * 1000)
-}
-
 export function stylistSegments(
   scheduledAt: Date,
   lineItems: LineItemLike[]

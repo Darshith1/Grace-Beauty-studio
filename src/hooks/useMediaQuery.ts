@@ -1,22 +1,20 @@
 import { useEffect, useState } from 'react'
 
-/** Client-only: matches `window.matchMedia(query)`. */
-export function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia(query).matches : false
-  )
-
-  useEffect(() => {
-    const mq = window.matchMedia(query)
-    const fn = () => setMatches(mq.matches)
-    setMatches(mq.matches)
-    mq.addEventListener('change', fn)
-    return () => mq.removeEventListener('change', fn)
-  }, [query])
-
-  return matches
+function subscribeMediaQuery(query: string, setMatches: (v: boolean) => void) {
+  const mq = window.matchMedia(query)
+  const fn = () => setMatches(mq.matches)
+  queueMicrotask(() => setMatches(mq.matches))
+  mq.addEventListener('change', fn)
+  return () => mq.removeEventListener('change', fn)
 }
 
+/** `md` breakpoint and up (Tailwind `md:`). Client-only. */
 export function useMdUp() {
-  return useMediaQuery('(min-width: 768px)')
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : false
+  )
+
+  useEffect(() => subscribeMediaQuery('(min-width: 768px)', setMatches), [])
+
+  return matches
 }
