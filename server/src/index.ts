@@ -27,12 +27,14 @@ import { sendBookingConfirmation } from './email.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const uploadsDir = path.join(__dirname, '..', 'uploads')
+const isVercel = Boolean(process.env.VERCEL)
+const uploadsDir = isVercel ? path.join('/tmp', 'grace-uploads') : path.join(__dirname, '..', 'uploads')
 fs.mkdirSync(uploadsDir, { recursive: true })
 
 const PORT = Number(process.env.PORT) || 4000
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/grace-beauty-studio'
 const FRONTEND_URL = (process.env.FRONTEND_URL || '').replace(/\/$/, '')
+let mongoConnectPromise: Promise<typeof mongoose> | null = null
 
 function tokensMatch(stored: string | null | undefined, provided: string) {
   if (!stored) return false
@@ -45,7 +47,9 @@ function tokensMatch(stored: string | null | undefined, provided: string) {
 const app = express()
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
-app.use('/uploads', express.static(uploadsDir))
+if (!isVercel) {
+  app.use('/uploads', express.static(uploadsDir))
+}
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -331,6 +335,12 @@ app.patch('/api/admin/appointments/:id', authMiddleware, async (req, res) => {
 })
 
 app.post('/api/admin/upload', authMiddleware, upload.single('file'), (req, res) => {
+  if (isVercel) {
+    return res.status(501).json({
+      error:
+        'Direct file uploads are not supported on Vercel without persistent object storage. Paste an external image URL instead.',
+    })
+  }
   const f = req.file
   if (!f) {
     return res.status(400).json({ error: 'Invalid or missing image file' })
@@ -380,15 +390,31 @@ app.delete('/api/admin/stylists/:id', authMiddleware, async (req, res) => {
   res.status(204).end()
 })
 
+export async function connectToDatabase() {
+  if (mongoose.connection.readyState === 1) return mongoose
+  if (!mongoConnectPromise) {
+    mongoConnectPromise = mongoose.connect(MONGODB_URI).catch((error) => {
+      mongoConnectPromise = null
+      throw error
+    })
+  }
+  await mongoConnectPromise
+  return mongoose
+}
+
 async function start() {
-  await mongoose.connect(MONGODB_URI)
+  await connectToDatabase()
   console.log('MongoDB connected')
   app.listen(PORT, () => {
     console.log(`API http://localhost:${PORT}`)
   })
 }
 
-start().catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
+export default app
+
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  start().catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+}

@@ -35,9 +35,25 @@ npm run dev            # runs API + Vite together
 
 ## Production
 
-- Build the SPA: `npm run build` → `dist/`.
-- Run the API with `NODE_ENV=production` and `MONGODB_URI` / secrets on your host (Railway, Render, Fly, etc.).
-- Set the SPA `VITE_API_URL` to your public API origin if the API is not same-origin (otherwise use a reverse proxy so `/api` hits the server).
+### Vercel
+
+- This repo can now deploy to a single Vercel project with the SPA and Express API together.
+- Vercel serves the frontend from `dist/` and routes `/api/*` into the Express app via `api/index.ts` and `api/[...path].ts`.
+- Add these environment variables in the Vercel project:
+  - `MONGODB_URI`
+  - `JWT_SECRET`
+  - `ADMIN_EMAIL`
+  - `ADMIN_PASSWORD`
+  - `FRONTEND_URL`
+  - `RESEND_API_KEY` (optional)
+  - `EMAIL_FROM` (optional)
+- Leave `VITE_API_URL` empty on Vercel so the frontend uses same-origin `/api/...`.
+- Run `npm run seed` locally against the same `MONGODB_URI` at least once to create the first admin account.
+
+### Uploads on Vercel
+
+- Vercel does not persist local disk uploads from Express. The admin upload endpoint returns a clear error in that environment.
+- For production on Vercel, use hosted image URLs directly in the admin forms, or wire the upload route to object storage such as Vercel Blob, S3, or Cloudinary.
 
 ## Scripts
 
