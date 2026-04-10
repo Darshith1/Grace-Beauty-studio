@@ -60,6 +60,15 @@ function tokensMatch(stored: string | null | undefined, provided: string) {
 }
 
 const app = express()
+/** After vercel.json rewrites `/api/*` → `/api/index`, keep the public path for Express matchers. */
+if (isVercel) {
+  app.use((req, _res, next) => {
+    if (req.originalUrl?.startsWith('/api')) {
+      req.url = req.originalUrl
+    }
+    next()
+  })
+}
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 /** Vercel serverless + local: ensure Mongo is ready before route handlers. */
