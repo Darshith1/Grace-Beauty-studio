@@ -33,8 +33,23 @@ fs.mkdirSync(uploadsDir, { recursive: true })
 
 const PORT = Number(process.env.PORT) || 4000
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/grace-beauty-studio'
+if (isVercel && MONGODB_URI.includes('127.0.0.1')) {
+  console.warn('[db] Set MONGODB_URI in Vercel env to your Atlas URI (localhost is not reachable).')
+}
 const FRONTEND_URL = (process.env.FRONTEND_URL || '').replace(/\/$/, '')
 let mongoConnectPromise: Promise<typeof mongoose> | null = null
+
+export async function connectToDatabase() {
+  if (mongoose.connection.readyState === 1) return mongoose
+  if (!mongoConnectPromise) {
+    mongoConnectPromise = mongoose.connect(MONGODB_URI).catch((error) => {
+      mongoConnectPromise = null
+      throw error
+    })
+  }
+  await mongoConnectPromise
+  return mongoose
+}
 
 function tokensMatch(stored: string | null | undefined, provided: string) {
   if (!stored) return false
@@ -47,6 +62,15 @@ function tokensMatch(stored: string | null | undefined, provided: string) {
 const app = express()
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
+/** Vercel serverless + local: ensure Mongo is ready before route handlers. */
+app.use(async (_req, _res, next) => {
+  try {
+    await connectToDatabase()
+    next()
+  } catch (e) {
+    next(e)
+  }
+})
 if (!isVercel) {
   app.use('/uploads', express.static(uploadsDir))
 }
@@ -389,18 +413,6 @@ app.delete('/api/admin/stylists/:id', authMiddleware, async (req, res) => {
   await StylistModel.findByIdAndDelete(req.params.id)
   res.status(204).end()
 })
-
-export async function connectToDatabase() {
-  if (mongoose.connection.readyState === 1) return mongoose
-  if (!mongoConnectPromise) {
-    mongoConnectPromise = mongoose.connect(MONGODB_URI).catch((error) => {
-      mongoConnectPromise = null
-      throw error
-    })
-  }
-  await mongoConnectPromise
-  return mongoose
-}
 
 async function start() {
   await connectToDatabase()

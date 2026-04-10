@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Mongoose `models.X || model()` needs a callable Model; plain `any` avoids TS2349 on Vercel. */
 import mongoose, { type Model } from 'mongoose'
 
 const lineItemSchema = new mongoose.Schema(

@@ -1,8 +1,12 @@
-const apiBase = import.meta.env.VITE_API_URL || ''
+const rawApiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 function url(path: string) {
   if (path.startsWith('http')) return path
-  return `${apiBase}${path}`
+  /** If base is `https://x.vercel.app/api`, avoid `/api` + `/api/services` → double `/api`. */
+  if (rawApiBase.endsWith('/api') && path.startsWith('/api')) {
+    return `${rawApiBase}${path.slice(4)}`
+  }
+  return `${rawApiBase}${path}`
 }
 
 async function errorMessageFromResponse(r: Response) {
