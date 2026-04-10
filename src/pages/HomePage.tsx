@@ -11,19 +11,17 @@ export function HomePage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:py-10">
       <section className="text-center">
-        <div className="mx-auto inline-flex max-w-full rounded-2xl bg-[#fdfbf7] px-3 py-3 sm:px-5 sm:py-5">
+        <div className="mx-auto inline-flex max-w-full rounded-2xl bg-[#fdfbf7] px-4 pt-4 pb-0 sm:px-8 sm:pt-8 sm:pb-0">
           <img
             src="/logo.png"
             alt={`${SALON_NAME} logo`}
-            className="mx-auto h-40 w-auto max-w-[min(100%,340px)] object-contain sm:h-48"
-            width={340}
-            height={136}
+            className="mx-auto block h-56 w-auto max-w-[min(100%,480px)] object-contain sm:h-72 md:h-80"
+            width={319}
+            height={498}
           />
         </div>
-        <h1 className="mt-6 font-[family-name:var(--font-display)] text-2xl font-semibold text-[#8b5e3c] sm:text-3xl">
-          {SALON_NAME}
-        </h1>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-700 sm:text-base">
+        <h1 className="sr-only">{SALON_NAME}</h1>
+        <p className="mt-4 text-sm leading-relaxed text-neutral-700 sm:text-base">
           Natural beauty, expert care — lashes, brows, facials, and waxing in Voorhees.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
