@@ -1,0 +1,48 @@
+# Grace Beauty Studio
+
+Mobile-first React (Vite) + Tailwind customer site with a booking flow, plus a hidden **admin** area at `/admin` for managing services, stylists, and viewing appointments.
+
+The API is a small **Express** + **MongoDB Atlas** (Mongoose) server in `server/`. Confirmation emails use [Resend](https://resend.com) when `RESEND_API_KEY` is set.
+
+## Prerequisites
+
+- Node 20+
+- MongoDB (local `mongodb://127.0.0.1:27017` or [MongoDB Atlas](https://www.mongodb.com/atlas) connection string)
+
+## Setup
+
+### 1. API (`server/`)
+
+```bash
+cd server
+cp .env.example .env
+# Set MONGODB_URI, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD, RESEND_API_KEY (optional), EMAIL_FROM
+npm install
+npm run seed   # creates admin user + sample services/stylists if empty
+npm run dev    # http://localhost:4000
+```
+
+### 2. Web (repo root)
+
+```bash
+cp .env.example .env   # optional; Vite proxies /api to localhost:4000 in dev
+npm install
+npm run dev            # runs API + Vite together
+```
+
+- Customer site: Vite dev server (default **5173**), proxied to API **4000**.
+- Admin: open **http://localhost:5173/admin** (no link on the public site).
+
+## Production
+
+- Build the SPA: `npm run build` → `dist/`.
+- Run the API with `NODE_ENV=production` and `MONGODB_URI` / secrets on your host (Railway, Render, Fly, etc.).
+- Set the SPA `VITE_API_URL` to your public API origin if the API is not same-origin (otherwise use a reverse proxy so `/api` hits the server).
+
+## Scripts
+
+| Command        | Description                |
+| -------------- | -------------------------- |
+| `npm run dev`  | API + Vite concurrently    |
+| `npm run build`| Typecheck + Vite build     |
+| `npm run lint` | ESLint                     |

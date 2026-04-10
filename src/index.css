@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand: #8b5e3c;
+  --color-brand-dark: #6b472d;
+  --color-cream: #fdfbf7;
+  --font-display: 'Playfair Display', ui-serif, Georgia, serif;
+  /* Body text: classic serif, readable on mobile */
+  --font-sans: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem; /* 15px — slightly smaller for mobile */
+  line-height: 1.55;
+  background-color: var(--color-cream);
+  color: #1a1a1a;
+}
