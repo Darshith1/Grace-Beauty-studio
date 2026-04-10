@@ -381,7 +381,6 @@ app.delete('/api/admin/stylists/:id', authMiddleware, async (req, res) => {
 })
 
 async function start() {
-  console.log('MONGODB_URI:', MONGODB_URI)
   await mongoose.connect(MONGODB_URI)
   console.log('MongoDB connected')
   app.listen(PORT, () => {
