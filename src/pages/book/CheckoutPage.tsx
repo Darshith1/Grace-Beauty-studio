@@ -4,6 +4,7 @@ import { useBookingStore } from '../../store/bookingStore'
 import { apiPost } from '../../lib/api'
 import { CheckoutPricingSummary } from '../../components/CheckoutPricingSummary'
 import { bookBg, btnPrimary } from '../../lib/bookingUi'
+import { DIAL_OPTIONS, nationalDigits, toE164 } from '../../lib/dialCodes'
 
 const SESSION_PREFIX = 'grace_confirm_'
 
@@ -26,10 +27,20 @@ export function CheckoutPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!customer.firstName.trim() || !customer.lastName.trim()) {
+      setError('First and last name are required.')
+      return
+    }
+    const phoneDigits = nationalDigits(customer.phoneLocal)
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      setError('Enter a valid phone number (digits only after country code).')
+      return
+    }
     if (!customer.email.trim()) {
       setError('Email is required.')
       return
     }
+    const customerPhone = toE164(customer.dialCode, customer.phoneLocal)
     setSubmitting(true)
     setError(null)
     try {
@@ -39,7 +50,7 @@ export function CheckoutPage() {
         confirmationEmailSent: boolean
         appointment: Record<string, unknown>
       }>('/api/appointments', {
-        customerPhone: customer.phone,
+        customerPhone,
         customerEmail: customer.email,
         firstName: customer.firstName,
         lastName: customer.lastName,
@@ -99,30 +110,60 @@ export function CheckoutPage() {
           <form id="checkout-form" className="space-y-6" onSubmit={onSubmit}>
             <section>
               <h2 className="text-sm font-bold text-[#1a1a1a]">Contact info</h2>
-              <label className="mt-3 block text-xs font-medium text-neutral-600">Phone</label>
+              <label className="mt-3 block text-xs font-medium text-neutral-600">
+                Phone <span className="text-red-600">*</span>
+              </label>
+              <p className="mt-0.5 text-[11px] text-neutral-500">
+                Default +1. Use the code menu to pick another country.
+              </p>
+              <div className="mt-2 flex flex-row items-stretch gap-2">
+                <select
+                  className="shrink-0 basis-[5.25rem] rounded-xl border border-[#e8e0d8] bg-white px-1.5 py-3 text-center text-sm tabular-nums sm:basis-[5.5rem]"
+                  value={customer.dialCode}
+                  onChange={(e) => setCustomer({ dialCode: e.target.value })}
+                  aria-label="Country calling code"
+                >
+                  {DIAL_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  required
+                  className="min-w-0 flex-1 rounded-xl border border-[#e8e0d8] bg-white px-3 py-3 text-sm"
+                  placeholder="5551234567"
+                  value={customer.phoneLocal}
+                  onChange={(e) => setCustomer({ phoneLocal: e.target.value })}
+                  autoComplete="tel-national"
+                  aria-label="Phone number"
+                />
+              </div>
+              <label className="mt-3 block text-xs font-medium text-neutral-600">
+                First name <span className="text-red-600">*</span>
+              </label>
               <input
-                type="tel"
-                className="mt-1 w-full rounded-xl border border-[#e8e0d8] bg-white px-3 py-3 text-sm"
-                placeholder="+1"
-                value={customer.phone}
-                onChange={(e) => setCustomer({ phone: e.target.value })}
-                autoComplete="tel"
-              />
-              <label className="mt-3 block text-xs font-medium text-neutral-600">First name</label>
-              <input
+                required
                 className="mt-1 w-full rounded-xl border border-[#e8e0d8] bg-white px-3 py-3 text-sm"
                 value={customer.firstName}
                 onChange={(e) => setCustomer({ firstName: e.target.value })}
                 autoComplete="given-name"
               />
-              <label className="mt-3 block text-xs font-medium text-neutral-600">Last name</label>
+              <label className="mt-3 block text-xs font-medium text-neutral-600">
+                Last name <span className="text-red-600">*</span>
+              </label>
               <input
+                required
                 className="mt-1 w-full rounded-xl border border-[#e8e0d8] bg-white px-3 py-3 text-sm"
                 value={customer.lastName}
                 onChange={(e) => setCustomer({ lastName: e.target.value })}
                 autoComplete="family-name"
               />
-              <label className="mt-3 block text-xs font-medium text-neutral-600">Email *</label>
+              <label className="mt-3 block text-xs font-medium text-neutral-600">
+                Email <span className="text-red-600">*</span>
+              </label>
               <input
                 required
                 type="email"

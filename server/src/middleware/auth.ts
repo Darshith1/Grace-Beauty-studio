@@ -30,5 +30,3 @@ export function authMiddleware(req: AuthedRequest, res: Response, next: NextFunc
 export function signToken(adminId: string, email: string) {
   return jwt.sign({ sub: adminId, email }, JWT_SECRET, { expiresIn: '7d' })
 }
-
-export { JWT_SECRET }

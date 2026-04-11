@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { apiGet, type ApiService, type ApiStylist } from '../../lib/api'
 import { mediaUrl } from '../../lib/mediaUrl'
 import { SALON_PHONE_DISPLAY, SALON_PHONE_TEL } from '../../lib/salon'
-import { bookBg, bookBorder, bookCard } from '../../lib/bookingUi'
+import { bookBg, bookBorder, bookCard, bookCardMedia } from '../../lib/bookingUi'
 
 export function ServiceMenuPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -121,11 +121,11 @@ export function ServiceMenuPage() {
                 <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-[#5c3d28]">
                   {category}
                 </h2>
-                <div className="mt-4 grid auto-rows-fr gap-4 sm:grid-cols-2">
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 sm:items-stretch">
                   {items.map((s) => (
                     <article
                       key={s._id}
-                      className={`flex h-full min-h-[18rem] flex-col overflow-hidden ${bookCard}`}
+                      className={`flex h-full flex-col overflow-hidden ${bookCard}`}
                     >
                       {!s.noPhoto && s.imageUrl && (
                         <Link
@@ -141,14 +141,14 @@ export function ServiceMenuPage() {
                           />
                         </Link>
                       )}
-                      <div className="flex min-h-0 flex-1 flex-col p-4">
-                        <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[#1a1a1a] sm:text-lg">
+                      <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
+                        <h3 className="line-clamp-2 min-h-[3rem] font-[family-name:var(--font-display)] text-base font-semibold leading-snug text-[#1a1a1a] sm:text-lg">
                           {s.name}
                         </h3>
-                        <p className="mt-2 min-h-[4.25rem] flex-1 text-sm leading-relaxed text-neutral-600 line-clamp-4">
+                        <p className="mt-1 h-16 overflow-hidden text-sm leading-snug text-neutral-600 line-clamp-3">
                           {s.description}
                         </p>
-                        <div className="mt-auto flex items-end justify-between gap-2 border-t border-[#f0ebe3] pt-3">
+                        <div className="mt-auto flex items-end justify-between gap-2 border-t border-[#f0ebe3] pt-2.5">
                           <Link
                             to={`/book/staff/${s._id}${stylistIdFromUrl ? `?stylistId=${stylistIdFromUrl}` : ''}`}
                             className="text-sm font-semibold text-[#8b5e3c] underline-offset-2 hover:underline"
@@ -176,35 +176,39 @@ export function ServiceMenuPage() {
             <p className="text-sm text-neutral-600">
               Pick a stylist, then we&apos;ll show services so you can complete your visit.
             </p>
-            <ul className="mt-6 grid auto-rows-fr gap-4 sm:grid-cols-2 sm:items-stretch">
+            <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:items-stretch">
               {stylists.map((st) => (
-                <li key={st._id} className="flex min-h-[22rem] sm:min-h-[24rem]">
+                <li key={st._id} className="flex h-full min-h-0">
                   <button
                     type="button"
                     onClick={() => pickStylist(st._id)}
-                    className={`flex h-full min-h-[22rem] w-full flex-col overflow-hidden text-left sm:min-h-[24rem] ${bookCard}`}
+                    className={`flex h-full w-full flex-col overflow-hidden text-left ${bookCard}`}
                   >
                     {!st.noPhoto && st.avatarUrl ? (
-                      <img
-                        src={mediaUrl(st.avatarUrl)}
-                        alt=""
-                        className="aspect-square w-full shrink-0 object-cover"
-                        width={400}
-                        height={400}
-                      />
+                      <span className={`block ${bookCardMedia}`}>
+                        <img
+                          src={mediaUrl(st.avatarUrl)}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          width={400}
+                          height={160}
+                        />
+                      </span>
                     ) : (
-                      <div className="flex aspect-square w-full shrink-0 items-center justify-center bg-[#f5f0e8] text-3xl font-semibold text-[#5c3d28]">
+                      <span
+                        className={`flex ${bookCardMedia} items-center justify-center bg-[#f5f0e8] text-2xl font-semibold text-[#5c3d28] sm:text-3xl`}
+                      >
                         {st.name.charAt(0).toUpperCase()}
-                      </div>
+                      </span>
                     )}
-                    <div className="flex min-h-0 flex-1 flex-col p-4">
-                      <p className="font-[family-name:var(--font-display)] text-base font-semibold text-[#1a1a1a] sm:text-lg">
+                    <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
+                      <p className="line-clamp-2 min-h-[3rem] font-[family-name:var(--font-display)] text-base font-semibold leading-snug text-[#1a1a1a] sm:text-lg">
                         {st.name}
                       </p>
-                      <p className="mt-2 min-h-[4.5rem] flex-1 text-sm leading-relaxed text-neutral-600 line-clamp-4">
+                      <p className="mt-1 h-16 overflow-hidden text-sm leading-snug text-neutral-600 line-clamp-3">
                         {st.bio}
                       </p>
-                      <span className="mt-3 inline-flex text-sm font-semibold text-[#8b5e3c]">
+                      <span className="mt-auto inline-flex border-t border-[#f0ebe3] pt-2.5 text-sm font-semibold text-[#8b5e3c]">
                         Schedule with {st.name.split(' ')[0]} →
                       </span>
                     </div>

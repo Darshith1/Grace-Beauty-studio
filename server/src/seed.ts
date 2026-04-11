@@ -6,6 +6,7 @@ import {
   StylistModel,
   AdminModel,
 } from './models.js'
+import { MENU_SERVICES } from './menuSeedData.js'
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/grace-beauty-studio'
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@gracebeautystudio.local'
@@ -25,53 +26,8 @@ async function main() {
 
   const serviceCount = await ServiceModel.countDocuments()
   if (serviceCount === 0) {
-    await ServiceModel.insertMany([
-      {
-        category: 'Lashes',
-        name: 'Classic Full Set',
-        description: 'Natural-looking individual lash extensions tailored to your eye shape.',
-        priceCents: 12000,
-        durationMinutes: 120,
-        imageUrl:
-          'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400&h=300&fit=crop',
-        sortOrder: 1,
-        active: true,
-      },
-      {
-        category: 'Brows',
-        name: 'Brow Shaping & Tint',
-        description: 'Wax or tweeze with optional tint for defined brows.',
-        priceCents: 4500,
-        durationMinutes: 45,
-        imageUrl:
-          'https://images.unsplash.com/photo-1596462502278-27bfdc403368?w=400&h=300&fit=crop',
-        sortOrder: 2,
-        active: true,
-      },
-      {
-        category: 'Facial',
-        name: 'Signature Glow Facial',
-        description: 'Cleanse, exfoliate, mask, and hydration for refreshed skin.',
-        priceCents: 9500,
-        durationMinutes: 60,
-        imageUrl:
-          'https://images.unsplash.com/photo-1570172619640-dfd03ed5d881?w=400&h=300&fit=crop',
-        sortOrder: 3,
-        active: true,
-      },
-      {
-        category: 'Waxing',
-        name: 'Brazilian Wax',
-        description: 'Professional full wax with premium hard wax for comfort.',
-        priceCents: 6500,
-        durationMinutes: 45,
-        imageUrl:
-          'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&h=300&fit=crop',
-        sortOrder: 4,
-        active: true,
-      },
-    ])
-    console.log('Seeded services')
+    await ServiceModel.insertMany(MENU_SERVICES)
+    console.log(`Seeded ${MENU_SERVICES.length} services from menu`)
   }
 
   const stylistCount = await StylistModel.countDocuments()

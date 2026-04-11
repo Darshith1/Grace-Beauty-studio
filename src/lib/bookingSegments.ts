@@ -3,7 +3,7 @@ export type LineItemLike = {
   durationMinutes: number
 }
 
-export function stylistSegments(
+function stylistSegments(
   scheduledAt: Date,
   lineItems: LineItemLike[]
 ): { stylistId: string; start: Date; end: Date }[] {

@@ -53,6 +53,8 @@ export function ConfirmationPage() {
   const [sessionTick, setSessionTick] = useState(0)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+  const [cancelSuccess, setCancelSuccess] = useState(false)
+  const [redirectSeconds, setRedirectSeconds] = useState(5)
 
   useEffect(() => {
     reset()
@@ -94,6 +96,28 @@ export function ConfirmationPage() {
       cancelled = true
     }
   }, [id, tokenFromUrl, setSearchParams])
+
+  useEffect(() => {
+    if (!cancelSuccess) return
+    const interval = setInterval(() => {
+      setRedirectSeconds((s) => Math.max(0, s - 1))
+    }, 1000)
+    const timeout = setTimeout(() => {
+      clearInterval(interval)
+      if (id) {
+        try {
+          sessionStorage.removeItem(`${SESSION_KEY}${id}`)
+        } catch {
+          /* ignore */
+        }
+      }
+      navigate('/', { replace: true })
+    }, 5000)
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [cancelSuccess, id, navigate])
 
   const appointment = useMemo((): ApptDoc | null => {
     void sessionTick
@@ -150,6 +174,35 @@ export function ConfirmationPage() {
     })
     return URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }))
   }, [appointment, id])
+
+  if (cancelSuccess) {
+    return (
+      <div
+        className={`flex min-h-screen flex-col items-center justify-center px-6 py-16 ${bookBg}`}
+      >
+        <div className="w-full max-w-md rounded-2xl border border-[#e8e0d8] bg-white p-8 text-center shadow-sm">
+          <p className="text-4xl" aria-hidden>
+            ✓
+          </p>
+          <h1 className="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold text-[#1a1a1a]">
+            Appointment cancelled
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+            Your booking has been cancelled. We hope to see you another time.
+          </p>
+          <p className="mt-6 text-sm font-medium text-[#5c3d28]">
+            Returning to home in {redirectSeconds}s…
+          </p>
+          <Link
+            to="/"
+            className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-[#8b5e3c] px-4 text-sm font-semibold text-white"
+          >
+            Go home now
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`min-h-screen ${bookBg} pb-16`}>
@@ -268,6 +321,8 @@ export function ConfirmationPage() {
                           /* ignore */
                         }
                         setSessionTick((t) => t + 1)
+                        setRedirectSeconds(5)
+                        setCancelSuccess(true)
                       } catch (e) {
                         setCancelError(e instanceof Error ? e.message : 'Could not cancel')
                       } finally {

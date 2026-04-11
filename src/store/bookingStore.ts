@@ -19,7 +19,10 @@ export type LineItem = {
 }
 
 type Customer = {
-  phone: string
+  /** Country calling code without + (default US/CA `1`). */
+  dialCode: string
+  /** National number only; combined with dialCode as E.164 on submit. */
+  phoneLocal: string
   email: string
   firstName: string
   lastName: string
@@ -40,7 +43,8 @@ type BookingState = {
 }
 
 const emptyCustomer: Customer = {
-  phone: '',
+  dialCode: '1',
+  phoneLocal: '',
   email: '',
   firstName: '',
   lastName: '',

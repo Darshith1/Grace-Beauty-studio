@@ -1,13 +1,11 @@
 /** Shared booking flow styling aligned with home (Grace brand). */
 export const bookBg = 'bg-[#fdfbf7]'
-export const bookText = 'text-[#1a1a1a]'
-export const bookMuted = 'text-neutral-600'
 export const bookBorder = 'border-[#e8e0d8]'
 export const bookCard = 'rounded-2xl border border-[#e8e0d8] bg-white shadow-sm'
+/** Same media height on service + staff cards so grid rows align. */
+export const bookCardMedia = 'h-36 w-full shrink-0 overflow-hidden sm:h-40'
 export const btnPrimary =
   'min-h-[48px] rounded-xl bg-[#8b5e3c] px-4 py-3 text-sm font-semibold text-white hover:bg-[#6b472d] disabled:opacity-40 sm:text-[0.9375rem]'
-export const btnOutline =
-  'min-h-[44px] rounded-xl border border-[#8b5e3c] px-4 py-2 text-sm font-semibold text-[#8b5e3c] hover:bg-[#fdfbf7] sm:text-[0.9375rem]'
 
 /**
  * Mobile: anchor fixed “appointment summary” above CustomerChrome Call/Home bar

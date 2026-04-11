@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { LineItem } from '../store/bookingStore'
 import { bookBorder, bookCard, btnPrimary } from '../lib/bookingUi'
-import { useMdUp } from '../hooks/useMediaQuery'
+import { useMdUp } from '../hooks/useMdUp'
 import { ServiceThumb, StylistFace } from './BookingLineMedia'
 
 type Props = {

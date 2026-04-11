@@ -190,6 +190,17 @@ app.post('/api/appointments', async (req, res) => {
     return res.status(400).json({ error: 'Invalid payload' })
   }
 
+  const phoneRaw = (body.customerPhone ?? '').trim()
+  const phoneDigits = phoneRaw.startsWith('+')
+    ? phoneRaw.slice(1).replace(/\D/g, '')
+    : phoneRaw.replace(/\D/g, '')
+  if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+    return res.status(400).json({ error: 'A valid phone number is required' })
+  }
+  if (!body.firstName?.trim() || !body.lastName?.trim()) {
+    return res.status(400).json({ error: 'First and last name are required' })
+  }
+
   const scheduledAt = new Date(body.scheduledAt)
   if (Number.isNaN(scheduledAt.getTime())) {
     return res.status(400).json({ error: 'Invalid appointment time' })
@@ -228,7 +239,7 @@ app.post('/api/appointments', async (req, res) => {
   const cancellationToken = randomBytes(32).toString('hex')
 
   const appt = await AppointmentModel.create({
-    customerPhone: body.customerPhone ?? '',
+    customerPhone: `+${phoneDigits}`,
     customerEmail: body.customerEmail.trim().toLowerCase(),
     firstName: body.firstName ?? '',
     lastName: body.lastName ?? '',
